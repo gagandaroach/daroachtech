@@ -5,7 +5,7 @@
 version: "3"
 
 networks:
-  backend:
+  daroachnetwork:
     external: true
 
 services:
@@ -16,7 +16,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
     networks:
-      - backend
+      - daroachnetwork
 
   #dynamic dns with google domains for msoe.dev
   msoedev_ddns:
@@ -25,4 +25,4 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
     networks:
-      - backend
+      - daroachnetwork
