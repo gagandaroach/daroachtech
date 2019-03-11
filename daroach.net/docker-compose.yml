@@ -18,5 +18,7 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./mime.types:/etc/nginx/mime.types
       - /srv/webroot:/webroot
+    ports: 
+      - 80:80
     networks: 
       - daroachnetwork
