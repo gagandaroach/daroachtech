@@ -7,7 +7,7 @@ networks:
 services:
   nginx-daroachnet:
     restart: always
-    image: nginx
+    image: nginx:stable-alpine
     environment:
       - VIRTUAL_HOST=daroach.net
       - VIRTUAL_NETWORK=daroachnetwork
@@ -15,10 +15,10 @@ services:
       - LETSENCRYPT_HOST=daroach.net
       - LETSENCRYPT_EMAIL=gagandaroach@gmail.com
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./mime.types:/etc/nginx/mime.types
-      - /srv/webroot:/webroot
-    ports: 
-      - 80:80
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # - ./mime.types:/etc/nginx/mime.types
+      - /srv/webroot:/webroot:ro
+    # ports: 
+    #   - 80:80
     networks: 
       - daroachnetwork
