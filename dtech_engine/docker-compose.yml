@@ -43,6 +43,19 @@ services:
     networks:
       - daroachnetwork
 
+  portainer:
+    restart: unless-stopped
+    image: portainer/portainer
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /srv/romans/portainer:/data
+    environment:
+      - VIRTUAL_HOST=portainer.daroach.net
+      - LETSENCRYPT_HOST=portainer.daroach.net
+      - LETSENCRYPT_EMAIL=gagandaroach@gmail.com
+    command: -H unix:///var/run/docker.sock
+
+
 volumes:
   conf:
   vhost:
