@@ -24,7 +24,9 @@ services:
     restart: always
     networks:
       - daroachnetwork
-
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
+      
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
     depends_on:
