@@ -21,26 +21,58 @@ services:
       - db-pass.env
     networks:
       - daroachnetwork
-      
+
+  #redis cache
+  cloud_redis:
+    image: redis:alpine
+    restart: always
+    networks:
+      - daroachnetwork
+
   #next cloud service
   cloud_service:
-    image: nextcloud:apache
+    image: nextcloud:fpm-alpine
     restart: always
-    ports:
-      - 9081:80
     volumes:
       - /ChandVolume/Cloud/nextcloud/html:/var/www/html
       - /ChandVolume/Cloud/nextcloud/config:/config
       - /ChandVolume/Cloud/nextcloud/data:/data
     environment:
       - MYSQL_HOST=cloud_db_service
-      - VIRTUAL_HOST=cloud.daroach.net
-      - VIRTUAL_PORT=80
-      - LETSENCRYPT_HOST=cloud.daroach.net
-      - LETSENCRYPT_EMAIL=gagandaroach@gmail.com
+      - REDIS_HOST=cloud_redis
     env_file:
       - db.env
     depends_on:
       - cloud_db_service
+      - cloud_redis
+    networks:
+      - daroachnetwork
+
+  #nginx proxy -> connects to jwilder
+  cloud_proxy:
+    build: ./cloud_proxy
+    restart: always
+    volumes:
+      - nextcloud:/var/www/html:ro
+    environment:
+      - VIRTUAL_HOST=cloud.daroach.net
+      - VIRTUAL_PORT=80
+      - LETSENCRYPT_HOST=cloud.daroach.net
+      - LETSENCRYPT_EMAIL=gagandaroach@gmail.com
+    depends_on:
+      - cloud_service
+    networks:
+      - daroachnetwork
+
+  #cron scraper
+  cron:
+    image: nextcloud:fpm-alpine
+    restart: always
+    volumes:
+      - nextcloud:/var/www/html
+    entrypoint: /cron.sh
+    depends_on:
+      - cloud_db_service
+      - cloud_redis
     networks:
       - daroachnetwork
