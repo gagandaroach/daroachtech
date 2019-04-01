@@ -54,6 +54,7 @@ services:
     restart: always
     volumes:
       - /ChandVolume/Cloud/nextcloud/html:/var/www/html:ro
+      - /ChandVolume/Cloud/nextcloud/config:/config
     environment:
       - VIRTUAL_HOST=cloud.daroach.net
       - VIRTUAL_PORT=80
