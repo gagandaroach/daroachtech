@@ -24,13 +24,6 @@ services:
     networks:
       - network
 
-  #redis cache
-  redis:
-    image: redis:alpine
-    restart: always
-    networks:
-      - network
-
   #next cloud service
   nextcloud:
     build: ./nextcloud_fpm
@@ -43,13 +36,11 @@ services:
       - ${MOUNT_POINT}/nextcloud/themes:/var/www/html/themes
     environment:
       - MYSQL_HOST=mariadb
-      - REDIS_HOST=redis
     env_file:
       - cloud.env
       - db.env
     depends_on:
       - mariadb
-      - redis
     networks:
       - network
 
@@ -80,6 +71,5 @@ services:
     entrypoint: /cron.sh
     depends_on:
       - mariadb
-      - redis
     networks:
       - network
