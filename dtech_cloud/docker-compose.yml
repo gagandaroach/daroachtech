@@ -7,8 +7,9 @@ version: "3"
 networks:
   daroachnetwork:
     external: true
-  cloudnetwork:
-  
+  network:
+    internal: true
+
 services:
   #next cloud maria db
   mariadb:
@@ -21,14 +22,14 @@ services:
       - db.env
       - db-pass.env
     networks:
-      - cloudnetwork
+      - network
 
   #redis cache
   redis:
     image: redis:alpine
     restart: always
     networks:
-      - cloudnetwork
+      - network
 
   #next cloud service
   nextcloud:
@@ -44,13 +45,13 @@ services:
       - MYSQL_HOST=mariadb
       - REDIS_HOST=redis
     env_file:
-      - db.env
       - cloud.env
+      - db.env
     depends_on:
       - mariadb
       - redis
     networks:
-      - cloudnetwork
+      - network
 
   #nginx proxy -> connects to jwilder
   nginx_proxy:
@@ -68,4 +69,17 @@ services:
       - nextcloud
     networks:
       - daroachnetwork
-      - cloudnetwork
+      - network
+
+  # nextcloud cron job
+  cron:
+    image: nextcloud:fpm-alpine
+    restart: always
+    volumes:
+      - ${MOUNT_POINT}/nextcloud:/var/www/html
+    entrypoint: /cron.sh
+    depends_on:
+      - mariadb
+      - redis
+    networks:
+      - network
