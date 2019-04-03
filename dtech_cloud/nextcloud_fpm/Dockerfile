@@ -3,10 +3,9 @@ FROM nextcloud:fpm-alpine
 RUN set -ex; \
     \
     apk add --no-cache \
-        ffmpeg \
+        # ffmpeg \
         imagemagick \
-        samba-client \
-        supervisor \
+        # samba-client \
       libreoffice \
     ;
 
