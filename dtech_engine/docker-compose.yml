@@ -57,6 +57,8 @@ services:
     command: -H unix:///var/run/docker.sock
     networks:
       - daroachnetwork
+    ports:
+    - "9000:80"
 
 
 volumes:
