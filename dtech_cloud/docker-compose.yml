@@ -7,73 +7,61 @@ version: "3"
 networks:
   daroachnetwork:
     external: true
+  cloudnetwork:
   
 services:
   #next cloud maria db
-  cloud_db_service:
+  mariadb:
     image: mariadb
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: always
     volumes:
-      - /ChandVolume/Cloud/mariadb:/var/lib/mysql
+      - ${MOUNT_POINT}/mariadb:/var/lib/mysql
     env_file:
       - db.env
       - db-pass.env
     networks:
-      - daroachnetwork
+      - cloudnetwork
 
   #redis cache
-  cloud_redis:
+  redis:
     image: redis:alpine
     restart: always
     networks:
-      - daroachnetwork
+      - cloudnetwork
 
   #next cloud service
-  cloud_service:
+  nextcloud:
     image: nextcloud:fpm-alpine
     restart: always
     volumes:
-      - /ChandVolume/Cloud/nextcloud/html:/var/www/html
-      - /ChandVolume/Cloud/nextcloud/config:/config
-      - /ChandVolume/Cloud/nextcloud/data:/data
+      - ${MOUNT_POINT}/nextcloud/html:/var/www/html
     environment:
-      - MYSQL_HOST=cloud_db_service
-      - REDIS_HOST=cloud_redis
+      - MYSQL_HOST=mariadb
+      - REDIS_HOST=redis
     env_file:
       - db.env
+      - cloud.env
     depends_on:
-      - cloud_db_service
-      - cloud_redis
+      - mariadb
+      - redis
     networks:
-      - daroachnetwork
+      - cloudnetwork
 
   #nginx proxy -> connects to jwilder
-  cloud_proxy:
-    build: ./cloud_proxy
+  nginx_proxy:
+    build: ./nginx_proxy
     restart: always
     volumes:
-      - /ChandVolume/Cloud/nextcloud/html:/var/www/html:ro
-      - /ChandVolume/Cloud/nextcloud/config:/config
+      - ${MOUNT_POINT}/nextcloud/html:/var/www/html:ro
+      - ${MOUNT_POINT}/nextcloud/config:/config
     environment:
       - VIRTUAL_HOST=cloud.daroach.net
       - VIRTUAL_PORT=80
       - LETSENCRYPT_HOST=cloud.daroach.net
       - LETSENCRYPT_EMAIL=gagandaroach@gmail.com
     depends_on:
-      - cloud_service
+      - nextcloud
     networks:
       - daroachnetwork
-
-  #cron scraper
-  cron:
-    image: nextcloud:fpm-alpine
-    restart: always
-    volumes:
-      - /ChandVolume/Cloud/nextcloud/html:/var/www/html
-    entrypoint: /cron.sh
-    depends_on:
-      - cloud_db_service
-      - cloud_redis
-    networks:
-      - daroachnetwork
+      - cloudnetwork
