@@ -30,7 +30,7 @@ services:
     restart: always
     volumes:
       - ${MOUNT_POINT}/nextcloud/html:/var/www/html
-      - ${MOUNT_POINT}/nextcloud/config:/var/www/html
+      - ${MOUNT_POINT}/nextcloud/config:/var/www/html/config
       - ${MOUNT_POINT}/nextcloud/apps:/var/www/html/custom_apps
       - ${MOUNT_POINT}/nextcloud/data:/var/www/html/data
       - ${MOUNT_POINT}/nextcloud/themes:/var/www/html/themes
