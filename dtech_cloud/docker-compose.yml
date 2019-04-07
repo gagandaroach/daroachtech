@@ -29,16 +29,12 @@ services:
     build: ./nextcloud_fpm
     restart: always
     volumes:
-      - ${MOUNT_POINT}/nextcloud/html:/var/www/html
-      - ${MOUNT_POINT}/nextcloud/config:/var/www/html/config
-      - ${MOUNT_POINT}/nextcloud/apps:/var/www/html/custom_apps
-      - ${MOUNT_POINT}/nextcloud/data:/var/www/html/data
-      - ${MOUNT_POINT}/nextcloud/themes:/var/www/html/themes
+      - ${MOUNT_POINT}/nextcloud:/var/www/html
     environment:
       - MYSQL_HOST=mariadb
     env_file:
-      - cloud.env
       - db.env
+      - cloud.env
     depends_on:
       - mariadb
     networks:
@@ -49,8 +45,7 @@ services:
     build: ./nginx_proxy
     restart: always
     volumes:
-      - ${MOUNT_POINT}/nextcloud/html:/var/www/html:ro
-      - ${MOUNT_POINT}/nextcloud/config:/config
+      - ${MOUNT_POINT}/nextcloud:/var/www/html:ro
     environment:
       - VIRTUAL_HOST=cloud.daroach.net
       - VIRTUAL_PORT=80
