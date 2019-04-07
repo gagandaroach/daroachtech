@@ -8,6 +8,8 @@ here you can find the workings of my [network stack](https://www.instagram.com/p
 
 this is my implementation of the core of my server stack. this docker-compose file spins up jwilder's [nginx proxy](https://hub.docker.com/r/jwilder/nginx-proxy/) container and the popular letencrypt [proxy companion](https://hub.docker.com/r/jrcs/letsencrypt-nginx-proxy-companion/) container.
 
+i highly highly reccommend reading jwidlers [blog posts](http://jasonwilder.com/blog/2014/03/25/automated-nginx-reverse-proxy-for-docker/) before you run any docker containers.
+
 ## daroach.net
 
 A work in progress personal page. Here, I hope to start a blog detailing the new things I am learning how to do with a computer. This container spins up a nginx server that serves the content on my servers `/srv/webroot` directory. Example docker-compose file working with jwilder's proxy tool.
