@@ -34,7 +34,7 @@ services:
   # next cloud main service
   nextcloud:
     build: ./nextcloud_apache
-    restart: always
+    restart: "no"
     volumes:
       - ${MOUNT_POINT}/nextcloud:/var/www/html
     environment:
@@ -57,7 +57,7 @@ services:
   # nextcloud cron job
   cron:
     image: nextcloud:apache
-    restart: always
+    restart: unless-stopped
     volumes:
       - ${MOUNT_POINT}/nextcloud:/var/www/html
     entrypoint: /cron.sh
