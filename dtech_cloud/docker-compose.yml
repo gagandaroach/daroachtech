@@ -7,11 +7,11 @@ version: "3"
 networks:
   daroachnetwork:
     external: true
-  network:
+  backend:
     internal: true
 
 services:
-  #next cloud maria db
+  #next cloud maria db sql server 
   mariadb:
     image: mariadb
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
@@ -22,54 +22,47 @@ services:
       - db.env
       - db-pass.env
     networks:
-      - network
+      - backend
 
-  #next cloud service
-  nextcloud:
-    build: ./nextcloud_fpm
+  # redis ram cache
+  redis:
+    image: redis:alpine
     restart: always
-    volumes:
-      - ${MOUNT_POINT}/nextcloud/html:/var/www/html
-      - ${MOUNT_POINT}/nextcloud/config:/var/www/html/config
-      - ${MOUNT_POINT}/nextcloud/apps:/var/www/html/custom_apps
-      - ${MOUNT_POINT}/nextcloud/data:/var/www/html/data
-      - ${MOUNT_POINT}/nextcloud/themes:/var/www/html/themes
-    environment:
-      - MYSQL_HOST=mariadb
-    env_file:
-      - cloud.env
-      - db.env
-    depends_on:
-      - mariadb
     networks:
-      - network
+      - backend
 
-  #nginx proxy -> connects to jwilder
-  nginx_proxy:
-    build: ./nginx_proxy
-    restart: always
+  # next cloud main service
+  nextcloud:
+    build: ./nextcloud_apache
+    restart: "no"
     volumes:
-      - ${MOUNT_POINT}/nextcloud/html:/var/www/html:ro
-      - ${MOUNT_POINT}/nextcloud/config:/config
+      - ${MOUNT_POINT}/nextcloud:/var/www/html
     environment:
       - VIRTUAL_HOST=cloud.daroach.net
       - VIRTUAL_PORT=80
       - LETSENCRYPT_HOST=cloud.daroach.net
       - LETSENCRYPT_EMAIL=gagandaroach@gmail.com
+      - MYSQL_HOST=mariadb
+      - REDIS_HOST=redis
+    env_file:
+      - db.env
+      - cloud.env
     depends_on:
-      - nextcloud
+      - mariadb
+      - redis
     networks:
+      - backend
       - daroachnetwork
-      - network
 
   # nextcloud cron job
   cron:
-    image: nextcloud:fpm-alpine
-    restart: always
+    image: nextcloud:apache
+    restart: unless-stopped
     volumes:
       - ${MOUNT_POINT}/nextcloud:/var/www/html
     entrypoint: /cron.sh
     depends_on:
       - mariadb
+      - redis
     networks:
-      - network
+      - backend
