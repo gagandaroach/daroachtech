@@ -72,13 +72,12 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
-      - UMASK_SET=022 #control permissions of files and directories created by radarr
     volumes:
       - ${ROOT_MOUNTPOINT}/radarr:/config
       - ${MOVIES_DIR}:/movies
       - ${DOWNLOADS_DIR}:/downloads
     ports:
       - 7878:7878
-    restart: unless-stopped
+    restart: "no"
     networks:
       - backend
