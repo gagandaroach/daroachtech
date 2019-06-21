@@ -15,7 +15,7 @@ services:
   mariadb:
     image: mariadb
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
-    restart: always
+    restart: "no"
     volumes:
       - ${MOUNT_POINT}/mariadb:/var/lib/mysql
     env_file:
@@ -57,7 +57,7 @@ services:
   # nextcloud cron job
   cron:
     image: nextcloud:apache
-    restart: unless-stopped
+    restart: "no"
     volumes:
       - ${MOUNT_POINT}/nextcloud:/var/www/html
     entrypoint: /cron.sh
