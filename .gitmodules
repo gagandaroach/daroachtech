@@ -1,3 +1,6 @@
 [submodule "daroachnet"]
 	path = daroachnet
 	url = git@github.com:gagandaroach/daroachnet.git
+[submodule "dtech_spark_cluster"]
+	path = dtech_spark_cluster
+	url = git@github.com:gagandaroach/dtech_spark_cluster.git
